@@ -1,0 +1,47 @@
+[
+    {
+        "fullname": "Luke Skywalker",
+        "organisation": "",
+        "sex": "M",
+        "birth": 1867,
+        "death": 1934,
+        "country": "US",
+        "prizes": [
+          {
+            "year": 1903,
+            "category": "fyzika",
+            "contrib_sk": "Práca na rádioaktivite",
+            "contrib_en": "Work on radioactivity"
+          },
+          {
+            "year": 1911,
+            "category": "chémia",
+            "contrib_sk": "Objav polónia a rádia",
+            "contrib_en": "Discovery of polonium and radium"
+          }
+        ]
+      },
+      {
+        "fullname": "Anakin Skywalker",
+        "organisation": "",
+        "sex": "M",
+        "birth": 0,
+        "death": 30,
+        "country": "US",
+        "prizes": [
+          {
+            "year": 1903,
+            "category": "fyzika",
+            "contrib_sk": "Práca na rádioaktivite",
+            "contrib_en": "Work on radioactivity"
+          },
+          {
+            "year": 1911,
+            "category": "mier",
+            "contrib_sk": "Objav polónia a rádia",
+            "contrib_en": "Discovery of polonium and radium"
+          }
+    ]
+      }
+    ]
+    

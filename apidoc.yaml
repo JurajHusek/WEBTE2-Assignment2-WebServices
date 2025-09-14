@@ -1,0 +1,390 @@
+openapi: 3.0.0
+paths:
+  /z1/api/v0/laureates:
+    get:
+      tags:
+        - Laureates
+      summary: 'Získať všetkých laureátov'
+      description: 'Vráti úplný zoznam laureátov bez detailov o cenách alebo krajinách.'
+      operationId: getAllLaureates
+      responses:
+        '200':
+          description: 'Zoznam laureátov'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties: { id: { type: integer, example: 1 }, fullname: { type: string, example: 'Albert Einstein' }, organisation: { type: string, example: 'Červený kríž' }, sex: { type: string, example: M }, birth_year: { type: integer, example: 1879 }, death_year: { type: integer, example: 1955 } }
+                  type: object
+        '500':
+          description: 'Chyba pri načítaní údajov'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: 'Databázová chyba' }
+                type: object
+    post:
+      tags:
+        - Laureates
+      summary: 'Pridať nového laureáta s cenami'
+      description: 'Vytvorí nového laureáta vrátane jeho krajiny a pridelených cien. Ak kategória je literatúra, môžu sa zadať aj detaily.'
+      operationId: createLaureateWithPrizes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - fullname
+                - sex
+                - birth
+                - prizes
+              properties:
+                fullname:
+                  type: string
+                  example: 'Albert Einstein'
+                organisation:
+                  type: string
+                  example: 'Princeton University'
+                sex:
+                  type: string
+                  enum: [M, F]
+                  example: M
+                birth:
+                  type: integer
+                  example: 1879
+                death:
+                  type: integer
+                  example: 1955
+                  nullable: true
+                country:
+                  type: string
+                  example: Švajčiarsko
+                prizes:
+                  type: array
+                  items: { required: [year, category, contrib_sk, contrib_en], properties: { year: { type: integer, example: 1921 }, category: { type: string, example: fyzika }, contrib_sk: { type: string, example: 'Za objav zákona fotoelektrického javu' }, contrib_en: { type: string, example: 'For the discovery of the photoelectric law' }, language_sk: { type: string, example: nemčina }, language_en: { type: string, example: German }, genre_sk: { type: string, example: 'vedecká literatúra' }, genre_en: { type: string, example: 'scientific literature' } }, type: object }
+              type: object
+      responses:
+        '201':
+          description: 'Laureát bol úspešne pridaný'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message: { type: string, example: 'Laureát, ceny a krajina úspešne vložené.' }
+                  id: { type: integer, example: 101 }
+                type: object
+        '400':
+          description: 'Neplatné dáta alebo duplicita'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: duplicate }
+                  message: { type: string, example: 'Laureát s daným menom už v databáze existuje.' }
+                type: object
+  '/z1/api/v0/laureates/{id}':
+    get:
+      tags:
+        - Laureates
+      summary: 'Získať konkrétneho laureáta podľa ID'
+      operationId: 8cb55c4ea858c47310df2aa6c6686ffe
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID laureáta'
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: 'Detail laureáta'
+          content:
+            application/json:
+              schema:
+                properties:
+                  id: { type: integer, example: 1 }
+                  fullname: { type: string, example: 'Albert Einstein' }
+                  organisation: { type: string, example: 'Princeton University' }
+                  sex: { type: string, enum: [M, F], example: M }
+                  birth_year: { type: integer, example: 1879 }
+                  death_year: { type: integer, example: 1955 }
+                type: object
+        '404':
+          description: 'Laureát neexistuje'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message: { type: string, example: 'Not found' }
+                type: object
+    put:
+      tags:
+        - Laureates
+      summary: 'Aktualizovať údaje o laureátovi'
+      description: 'Aktualizuje existujúceho laureáta vrátane jeho základných údajov a prípadne krajiny.'
+      operationId: updateLaureate
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID laureáta, ktorý sa má aktualizovať'
+          required: true
+          schema:
+            type: integer
+            example: 123
+      requestBody:
+        description: 'Dáta na aktualizáciu laureáta'
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - sex
+                - birth_year
+              properties:
+                fullname:
+                  type: string
+                  maxLength: 255
+                  example: 'Marie Curie'
+                organisation:
+                  type: string
+                  maxLength: 255
+                  example: 'Université de Paris'
+                sex:
+                  type: string
+                  enum: [M, F]
+                  example: F
+                birth_year:
+                  type: integer
+                  example: 1867
+                death_year:
+                  type: integer
+                  example: 1934
+                  nullable: true
+                country:
+                  type: string
+                  example: Francúzsko
+              type: object
+      responses:
+        '200':
+          description: 'Úspešná aktualizácia'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message: { type: string, example: 'Updated successfully' }
+                type: object
+        '400':
+          description: 'Chybná požiadavka'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: 'Missing required fields or invalid input' }
+                type: object
+        '404':
+          description: 'Laureát neexistuje'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message: { type: string, example: 'Not found' }
+                type: object
+    delete:
+      tags:
+        - Laureates
+      summary: 'Vymazať laureáta a jeho priradené dáta'
+      description: 'Vymaže laureáta, jeho prepojenia na krajiny, ceny a prípadne zmaže aj cenu (a jej detaily), ak už nie je prepojená na iného laureáta.'
+      operationId: deleteLaureate
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID laureáta, ktorý sa má vymazať'
+          required: true
+          schema:
+            type: integer
+            example: 123
+      responses:
+        '200':
+          description: 'Úspešné vymazanie'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message: { type: string, example: 'Deleted successfully' }
+                type: object
+        '404':
+          description: 'Laureát neexistuje'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message: { type: string, example: 'Not found' }
+                type: object
+        '400':
+          description: 'Chybná požiadavka'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message: { type: string, example: 'Bad request' }
+                  data: { type: string, example: 'Napr. PDO error message' }
+                type: object
+  /z1/api/v0/laureates/prizes:
+    get:
+      tags:
+        - Laureates
+      summary: 'Získať laureátov s ich Nobelovými cenami'
+      description: 'Vráti zoznam všetkých laureátov spolu s ich oceneniami, vrátane roka, kategórie a krajiny.'
+      operationId: getLaureatesWithPrizes
+      responses:
+        '200':
+          description: 'Zoznam laureátov s cenami'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties: { id: { type: integer, example: 42 }, fullname: { type: string, example: 'Marie Curie' }, organisation: { type: string, example: 'University of Paris' }, sex: { type: string, example: F }, birth_year: { type: string, example: '1867' }, death_year: { type: string, example: '1934' }, year: { type: string, example: '1903' }, category: { type: string, example: fyzika }, country_name: { type: string, example: Francúzsko } }
+                  type: object
+  '/z1/api/v0/laureates/{id}/details':
+    get:
+      tags:
+        - Laureates
+      summary: 'Získať kompletné detaily o laureátovi'
+      description: 'Vráti detailné informácie o laureátovi vrátane osobných údajov, cien a detailov k literárnym oceneniam.'
+      operationId: getLaureateFullDetails
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'ID laureáta'
+          required: true
+          schema:
+            type: integer
+            example: 123
+      responses:
+        '200':
+          description: 'Detaily o laureátovi'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties: { fullname: { type: string, example: 'Gabriel García Márquez' }, organisation: { type: string, example: 'Červený kríž' }, sex: { type: string, example: M }, birth_year: { type: string, example: '1927' }, death_year: { type: string, example: '2014' }, prize_id: { type: integer, example: 87 }, prize_year: { type: string, example: '1982' }, category: { type: string, example: literatúra }, contrib_sk: { type: string, example: 'Za jeho romány a poviedky...' }, contrib_en: { type: string, example: 'For his novels and short stories...' }, country: { type: string, example: Kolumbia }, details: { properties: { language_sk: { type: string, example: španielčina }, language_en: { type: string, example: Spanish }, genre_sk: { type: string, example: román }, genre_en: { type: string, example: novel } }, type: object } }
+                  type: object
+        '404':
+          description: 'Laureát neexistuje alebo chyba'
+  /z1/api/v0/laureates/filters:
+    get:
+      tags:
+        - Laureates
+      summary: 'Získať dostupné filtre (rok, kategória)'
+      description: 'Vráti zoznam všetkých dostupných rokov a kategórií, ktoré sa používajú pri filtrovaní laureátov.'
+      operationId: getAvailableFilters
+      responses:
+        '200':
+          description: 'Roky a kategórie pre filtrovanie'
+          content:
+            application/json:
+              schema:
+                properties:
+                  years: { type: array, items: { type: integer, example: 2023 } }
+                  categories: { type: array, items: { type: string, example: fyzika } }
+                type: object
+        '500':
+          description: 'Chyba pri získavaní filtrov'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message: { type: string, example: 'Chyba pri načítaní filtrov' }
+                  error: { type: string, example: 'SQLSTATE[42000]: ...' }
+                type: object
+  /z1/api/v0/laureates/prizes-filtered:
+    get:
+      tags:
+        - Laureates
+      summary: 'Filtrovať laureátov podľa roku, kategórie a krajiny'
+      description: 'Vráti zoznam laureátov podľa zvoleného filtra: rok, kategória a krajina. Nezadané parametre nebudú použité vo filtrovaní.'
+      operationId: filterPrizes
+      parameters:
+        -
+          name: year
+          in: query
+          description: 'Rok udelenia ceny'
+          required: false
+          schema:
+            type: integer
+            example: 2022
+        -
+          name: category
+          in: query
+          description: 'Kategória Nobelovej ceny'
+          required: false
+          schema:
+            type: string
+            example: chémia
+        -
+          name: country
+          in: query
+          description: 'Krajina laureáta'
+          required: false
+          schema:
+            type: string
+            example: Švédsko
+      responses:
+        '200':
+          description: 'Zoznam filtrovaných laureátov'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties: { id: { type: integer, example: 5 }, fullname: { type: string, example: 'Marie Curie' }, organisation: { type: string, example: 'Univerzita Sorbonne' }, year: { type: integer, example: 1911 }, category: { type: string, example: chémia }, country_name: { type: string, example: Francúzsko } }
+                  type: object
+        '500':
+          description: 'Chyba pri filtrovaní'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: 'SQL error' }
+                type: object
+components:
+  schemas:
+    Laureate:
+      required:
+      properties:
+        id:
+          type: integer
+          example: 1
+        fullname:
+          type: string
+          example: 'Marie Curie'
+        organisation:
+          type: string
+          example: Sorbonne
+        sex:
+          type: string
+          example: F
+        birth_year:
+          type: integer
+          example: 1867
+        death_year:
+          type: integer
+          example: 1934
+        country:
+          type: string
+          example: France
+      type: object
+tags:
+  -
+    name: Laureates
+    description: Laureates
